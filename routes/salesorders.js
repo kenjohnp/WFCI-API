@@ -5,7 +5,9 @@ const { Item } = require("../models/item");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const salesOrders = await SalesOrder.find().populate("soItems.item");
+  const salesOrders = await SalesOrder.find()
+    .populate("soItems.item")
+    .sort("-soDate");
   res.send(salesOrders);
 });
 
