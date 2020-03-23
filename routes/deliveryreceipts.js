@@ -1,8 +1,8 @@
 const express = require("express");
-const { DeliveryReceipt, validate } = require("../models/deliveryreceipt");
+const { DeliveryReceipt, validate } = require("../models/deliveryReceipt");
 const { Customer } = require("../models/customer");
 const { Item } = require("../models/item");
-const { SalesOrder } = require("../models/salesorder");
+const { SalesOrder } = require("../models/salesOrder");
 const router = express.Router();
 
 router.get("/", async (req, res) => {

@@ -4,7 +4,8 @@ const mongoose = require("mongoose");
 const salesOrderItemsSchema = new mongoose.Schema({
   item: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Item"
+    ref: "Item",
+    required: true
   },
   qty: { type: Number, min: 0, required: true },
   price: { type: Number, min: 0 }
@@ -46,7 +47,17 @@ const SalesOrder = mongoose.model("SalesOrder", salesOrderSchema);
 function validateSalesOrder(salesOrder) {
   const schema = Joi.object({
     customerId: Joi.objectId(),
-    soItems: Joi.array().required(),
+    soItems: Joi.array().items(
+      Joi.object({
+        item: Joi.objectId().required(),
+        qty: Joi.number()
+          .min(0)
+          .required(),
+        price: Joi.number()
+          .min(0)
+          .required()
+      })
+    ),
     soRefNo: Joi.string()
       .max(10)
       .required(),

@@ -4,7 +4,8 @@ const mongoose = require("mongoose");
 const drItemsSchema = new mongoose.Schema({
   item: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Item"
+    ref: "Item",
+    required: true
   },
   qty: { type: Number, min: 0, required: true }
 });
@@ -51,9 +52,16 @@ const DeliveryReceipt = mongoose.model(
 
 function validateDeliveryReceipt(deliveryReceipt) {
   const schema = Joi.object({
-    customerId: Joi.objectId(),
-    salesOrder: Joi.objectId,
-    drItems: Joi.array().required(),
+    customerId: Joi.objectId().required(),
+    salesOrder: Joi.objectId().required(),
+    drItems: Joi.array().items(
+      Joi.object({
+        item: Joi.objectId().required(),
+        qty: Joi.number()
+          .min(0)
+          .required()
+      })
+    ),
     drRefNo: Joi.string()
       .max(10)
       .required(),
