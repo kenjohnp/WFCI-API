@@ -1,17 +1,18 @@
-const express = require("express");
+const auth = require("../middleware/auth");
 const { SalesOrder, validate, validateItems } = require("../models/salesOrder");
 const { Customer } = require("../models/customer");
 const { Item } = require("../models/item");
+const express = require("express");
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", auth, async (req, res) => {
   const salesOrders = await SalesOrder.find()
     .populate("soItems.item")
     .sort("-soDate");
   res.send(salesOrders);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -38,7 +39,7 @@ router.post("/", async (req, res) => {
   res.send(salesOrder);
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -65,7 +66,7 @@ router.put("/:id", async (req, res) => {
   res.send(salesOrder);
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   const salesOrder = await SalesOrder.findByIdAndRemove(req.params.id);
 
   if (!salesOrder)
@@ -76,7 +77,7 @@ router.delete("/:id", async (req, res) => {
   res.send(salesOrder);
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
   const salesOrder = await SalesOrder.findById(req.params.id).populate(
     "soItems.item"
   );

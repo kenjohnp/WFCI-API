@@ -1,18 +1,19 @@
-const express = require("express");
+const auth = require("../middleware/auth");
 const { DeliveryReceipt, validate } = require("../models/deliveryReceipt");
 const { Customer } = require("../models/customer");
 const { Item } = require("../models/item");
 const { SalesOrder } = require("../models/salesOrder");
+const express = require("express");
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", auth, async (req, res) => {
   const deliveryReceipts = await DeliveryReceipt.find()
     .populate("drItems.item salesOrder", "soRefNo name")
     .sort("-drDate");
   res.send(deliveryReceipts);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -43,7 +44,7 @@ router.post("/", async (req, res) => {
   res.send(deliveryReceipt);
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -82,7 +83,7 @@ router.put("/:id", async (req, res) => {
   res.send(deliveryReceipt);
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   const deliveryReceipt = await DeliveryReceipt.findByIdAndRemove(
     req.params.id
   );
@@ -95,7 +96,7 @@ router.delete("/:id", async (req, res) => {
   res.send(deliveryReceipt);
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
   const deliveryReceipt = await DeliveryReceipt.findById(
     req.params.id
   ).populate("drItems.item salesOrder", "soRefNo name");
