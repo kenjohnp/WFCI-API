@@ -1,9 +1,12 @@
+/** @format */
+
 const winston = require("winston");
 const config = require("config");
 const express = require("express");
 const app = express();
 
 require("./startup/logging")();
+require("./startup/cors")(app);
 require("./startup/db")();
 require("./startup/routes")(app);
 require("./startup/config")();
