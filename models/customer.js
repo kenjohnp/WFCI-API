@@ -1,3 +1,5 @@
+/** @format */
+
 const Joi = require("@hapi/joi");
 const mongoose = require("mongoose");
 
@@ -34,11 +36,26 @@ function validateCustomer(customer) {
     name: Joi.string()
       .required()
       .max(255),
-    contactPerson: Joi.string().max(50),
-    contactNumber: Joi.string().max(20),
-    address: Joi.string().max(255),
-    tinNo: Joi.string().max(20),
-    businessStyle: Joi.string().max(50)
+    contactPerson: Joi.string()
+      .allow("")
+      .optional()
+      .max(50),
+    contactNumber: Joi.string()
+      .allow("")
+      .optional()
+      .max(20),
+    address: Joi.string()
+      .allow("")
+      .optional()
+      .max(255),
+    tinNo: Joi.string()
+      .allow("")
+      .optional()
+      .max(20),
+    businessStyle: Joi.string()
+      .allow("")
+      .optional()
+      .max(50)
   });
 
   return schema.validate(customer);
