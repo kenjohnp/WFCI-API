@@ -8,9 +8,7 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const users = await User.find()
-    .select("-password -__v")
-    .sort("username");
+  const users = await User.find().select("-password -__v").sort("username");
   res.send(users);
 });
 
@@ -45,7 +43,6 @@ router.put("/:id", async (req, res) => {
     req.params.id,
     {
       password: newPassword,
-      isAdmin: req.body.isAdmin
     },
     { new: true }
   );
@@ -53,6 +50,20 @@ router.put("/:id", async (req, res) => {
   if (!user)
     return res.status(404).send("The user with the given ID was not found.");
 
+  res.send(user);
+});
+
+router.put("/updateStatus/:id", async (req, res) => {
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    {
+      isAdmin: req.body.isAdmin,
+    },
+    { new: true }
+  );
+
+  if (!user)
+    return res.status(404).send("The user with the given ID was not found.");
   res.send(user);
 });
 

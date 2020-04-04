@@ -7,9 +7,7 @@ const { Customer, validate } = require("../models/customer");
 const router = express.Router();
 
 router.get("/", [auth], async (req, res) => {
-  const customers = await Customer.find()
-    .sort("name")
-    .select("-__v");
+  const customers = await Customer.find().sort("name").select("-__v");
   res.send(customers);
 });
 
@@ -23,7 +21,7 @@ router.post("/", [auth, admin], async (req, res) => {
     contactNumber: req.body.contactNumber,
     address: req.body.address,
     tinNo: req.body.tinNo,
-    businessStyle: req.body.businessStyle
+    businessStyle: req.body.businessStyle,
   });
 
   customer = await customer.save();
@@ -43,7 +41,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
       contactNumber: req.body.contactNumber,
       address: req.body.address,
       tinNo: req.body.tinNo,
-      businessStyle: req.body.businessStyle
+      businessStyle: req.body.businessStyle,
     },
     { new: true }
   );
