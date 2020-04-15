@@ -3,12 +3,21 @@ const mongoose = require("mongoose");
 
 const salesOrderItemsSchema = new mongoose.Schema({
   item: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Item",
-    required: true
+    type: new mongoose.Schema({
+      label: {
+        type: String,
+        required: true,
+        maxLength: 255,
+      },
+      value: {
+        type: String,
+        required: true,
+      },
+    }),
+    required: true,
   },
   qty: { type: Number, min: 0, required: true },
-  price: { type: Number, min: 0 }
+  price: { type: Number, min: 0 },
 });
 
 const salesOrderSchema = new mongoose.Schema({
@@ -17,29 +26,29 @@ const salesOrderSchema = new mongoose.Schema({
       name: {
         type: String,
         required: true,
-        maxLength: 255
-      }
+        maxLength: 255,
+      },
     }),
-    required: true
+    required: true,
   },
   soItems: [salesOrderItemsSchema],
   soRefNo: {
     type: String,
     required: true,
-    maxlength: 10
+    maxlength: 10,
   },
   soDate: {
     type: Date,
-    require: true
+    require: true,
   },
   remarks: {
     type: String,
-    maxlength: 500
+    maxlength: 500,
   },
   dateModified: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 const SalesOrder = mongoose.model("SalesOrder", salesOrderSchema);
@@ -49,23 +58,20 @@ function validateSalesOrder(salesOrder) {
     customerId: Joi.objectId(),
     soItems: Joi.array().items(
       Joi.object({
-        item: Joi.objectId().required(),
-        qty: Joi.number()
-          .min(0)
-          .required(),
-        price: Joi.number()
-          .min(0)
-          .required()
+        item: Joi.object({
+          label: Joi.string().max(255).required(),
+          value: Joi.string().max(255).required(),
+        }),
+        qty: Joi.number().min(0).required(),
+        price: Joi.number().min(0).required(),
       })
     ),
-    soRefNo: Joi.string()
-      .max(10)
-      .required(),
+    soRefNo: Joi.string().max(10).required(),
     soDate: Joi.date().required(),
-    remarks: Joi.string().max(500)
+    remarks: Joi.string().max(500),
   });
 
-  return schema.validate(salesOrder);
+  return schema.validate(salesOrder, { allowUnknown: true });
 }
 
 exports.SalesOrder = SalesOrder;
