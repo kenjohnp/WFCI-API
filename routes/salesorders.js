@@ -1,5 +1,9 @@
 const auth = require("../middleware/auth");
-const { SalesOrder, validate } = require("../models/salesOrder");
+const {
+  SalesOrder,
+  validate,
+  validateObjectId,
+} = require("../models/salesOrder");
 const { Customer } = require("../models/customer");
 const { Item } = require("../models/item");
 const express = require("express");
@@ -76,6 +80,11 @@ router.delete("/:id", auth, async (req, res) => {
 });
 
 router.get("/:id", auth, async (req, res) => {
+  if (!validateObjectId(req.params.id))
+    return res
+      .status(404)
+      .send("The Sales Order with the given ID was not found.");
+
   const salesOrder = await SalesOrder.findById(req.params.id);
 
   if (!salesOrder)

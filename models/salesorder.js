@@ -74,5 +74,10 @@ function validateSalesOrder(salesOrder) {
   return schema.validate(salesOrder, { allowUnknown: true });
 }
 
+function validateObjectId(id) {
+  return mongoose.Types.ObjectId.isValid(id);
+}
+
 exports.SalesOrder = SalesOrder;
 exports.validate = validateSalesOrder;
+exports.validateObjectId = validateObjectId;
