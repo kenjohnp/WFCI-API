@@ -1,5 +1,4 @@
-/** @format */
-
+const winston = require("winston");
 const { User } = require("../models/user");
 const bcrypt = require("bcrypt");
 
@@ -13,6 +12,6 @@ module.exports = async function () {
   user.password = await bcrypt.hash(user.password, salt);
   await user.save();
 
-  console.log("No Users. Please use default user.");
-  console.log("user: admin, password: admin");
+  winston.info("Initial user created.");
+  winston.info("user: admin, password: admin");
 };

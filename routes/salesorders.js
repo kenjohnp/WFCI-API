@@ -10,7 +10,29 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", auth, async (req, res) => {
-  const salesOrders = await SalesOrder.find().sort("-soDate");
+  let selectFields = {};
+  switch (req.query.filter) {
+    case "getCustomers":
+      selectFields = {
+        _id: 1,
+        customer: 1,
+        soRefNo: 1,
+      };
+      break;
+    case "getSOItems":
+      selectFields = {
+        _id: 1,
+        soItems: 1,
+      };
+      break;
+    default:
+      break;
+  }
+
+  const salesOrders = await SalesOrder.find()
+    .sort("-soDate")
+    .select(selectFields);
+
   res.send(salesOrders);
 });
 
@@ -20,6 +42,12 @@ router.post("/", auth, async (req, res) => {
 
   const customer = await Customer.findById(req.body.customerId);
   if (!customer) return res.status(400).send("Invalid Customer");
+
+  const checkExistingSO = await SalesOrder.findOne({
+    soRefNo: req.body.soRefNo,
+  });
+
+  if (checkExistingSO) return res.status(400).send("SO Ref No Already Exists");
 
   req.body.soItems.forEach(async (soItem) => {
     const itemId = await Item.findById(soItem.item.value);
@@ -47,6 +75,8 @@ router.put("/:id", auth, async (req, res) => {
 
   const customer = await Customer.findById(req.body.customerId);
   if (!customer) return res.status(400).send("Invalid Customer");
+
+  if (checkExistingSO) return res.status(400).send("SO Ref No Already Exists");
 
   const salesOrder = await SalesOrder.findByIdAndUpdate(
     req.params.id,
@@ -85,7 +115,13 @@ router.get("/:id", auth, async (req, res) => {
       .status(404)
       .send("The Sales Order with the given ID was not found.");
 
-  const salesOrder = await SalesOrder.findById(req.params.id);
+  let selectFields = {};
+
+  if (req.query.filter === "getSOItems")
+    selectFields =
+      "_id soItems.item soItems.qty soItems.item.label soItems.item.value";
+
+  const salesOrder = await SalesOrder.findById(req.params.id, selectFields);
 
   if (!salesOrder)
     return res

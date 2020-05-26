@@ -3,11 +3,20 @@ const mongoose = require("mongoose");
 
 const drItemsSchema = new mongoose.Schema({
   item: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Item",
-    required: true
+    type: new mongoose.Schema({
+      label: {
+        type: String,
+        required: true,
+        maxlength: 255,
+      },
+      value: {
+        type: String,
+        required: true,
+      },
+    }),
+    required: true,
   },
-  qty: { type: Number, min: 0, required: true }
+  qty: { type: Number, min: 0, required: true },
 });
 
 const deliveryReceiptSchema = new mongoose.Schema({
@@ -16,33 +25,33 @@ const deliveryReceiptSchema = new mongoose.Schema({
       name: {
         type: String,
         required: true,
-        maxlength: 255
-      }
+        maxlength: 255,
+      },
     }),
-    required: true
+    required: true,
   },
   drItems: [drItemsSchema],
   drRefNo: {
     type: String,
     required: true,
-    maxlength: 10
+    maxlength: 10,
   },
   drDate: {
     type: Date,
-    required: true
+    required: true,
   },
   remarks: {
     type: String,
-    maxlength: 500
+    maxlength: 500,
   },
   salesOrder: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "SalesOrder"
+    ref: "SalesOrder",
   },
   dateModified: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 const DeliveryReceipt = mongoose.model(
@@ -56,17 +65,16 @@ function validateDeliveryReceipt(deliveryReceipt) {
     salesOrder: Joi.objectId().required(),
     drItems: Joi.array().items(
       Joi.object({
-        item: Joi.objectId().required(),
-        qty: Joi.number()
-          .min(0)
-          .required()
+        item: Joi.object({
+          label: Joi.string().max(255).required(),
+          value: Joi.string().max(255).required(),
+        }),
+        qty: Joi.number().min(0).required(),
       })
     ),
-    drRefNo: Joi.string()
-      .max(10)
-      .required(),
+    drRefNo: Joi.string().max(10).required(),
     drDate: Joi.date().required(),
-    remarks: Joi.string().max(500)
+    remarks: Joi.string().max(500),
   });
   return schema.validate(deliveryReceipt);
 }

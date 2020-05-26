@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --verbose --detectOpenHandles --runInBand --watchAll --config ./jest.config.json",
     "start": "node index.js"
   },
   "keywords": [],
@@ -22,6 +22,10 @@
     "lodash": "^4.17.15",
     "mongoose": "^5.9.6",
     "nodemon": "^2.0.2",
+    "supertest": "^4.0.2",
     "winston": "^2.4.4"
+  },
+  "devDependencies": {
+    "jest": "^26.0.1"
   }
 }

@@ -1,18 +1,18 @@
-/** @format */
-
 const bcrypt = require("bcrypt");
 const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
+const validateObjectId = require("../middleware/validateObjectId");
 const _ = require("lodash");
 const { User, validate } = require("../models/user");
 const express = require("express");
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", [auth, admin], async (req, res) => {
   const users = await User.find().select("-password -__v").sort("username");
   res.send(users);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", [auth, admin], async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -32,7 +32,7 @@ router.post("/", async (req, res) => {
     .send(_.pick(user, ["_id", "username", "isAdmin"]));
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", [auth, admin, validateObjectId], async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -43,20 +43,6 @@ router.put("/:id", async (req, res) => {
     req.params.id,
     {
       password: newPassword,
-    },
-    { new: true }
-  );
-
-  if (!user)
-    return res.status(404).send("The user with the given ID was not found.");
-
-  res.send(user);
-});
-
-router.put("/updateStatus/:id", async (req, res) => {
-  const user = await User.findByIdAndUpdate(
-    req.params.id,
-    {
       isAdmin: req.body.isAdmin,
     },
     { new: true }
@@ -64,10 +50,11 @@ router.put("/updateStatus/:id", async (req, res) => {
 
   if (!user)
     return res.status(404).send("The user with the given ID was not found.");
+
   res.send(user);
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [auth, admin, validateObjectId], async (req, res) => {
   const user = await User.findByIdAndRemove(req.params.id);
 
   if (!user)

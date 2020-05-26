@@ -23,21 +23,27 @@ router.post("/", auth, async (req, res) => {
   const salesOrder = await SalesOrder.findById(req.body.salesOrder);
   if (!salesOrder) return res.status(400).send("Invalid Sales Order");
 
-  req.body.drItems.forEach(async drItem => {
-    const itemId = await Item.findById(drItem.item);
+  const checkExistingDR = await DeliveryReceipt.findOne({
+    drRefNo: req.body.drRefNo,
+  });
+
+  if (checkExistingDR) return res.status(400).send("DR already exists");
+
+  req.body.drItems.forEach(async (drItem) => {
+    const itemId = await Item.findById(drItem.item.value);
     if (!itemId) return res.status(400).send("Invalid Item");
   });
 
   let deliveryReceipt = new DeliveryReceipt({
     customer: {
       _id: customer._id,
-      name: customer.name
+      name: customer.name,
     },
     drItems: req.body.drItems,
     drRefNo: req.body.drRefNo,
     drDate: req.body.drDate,
     remarks: req.body.remarks,
-    salesOrder: salesOrder._id
+    salesOrder: salesOrder._id,
   });
 
   deliveryReceipt = await deliveryReceipt.save();
@@ -54,7 +60,7 @@ router.put("/:id", auth, async (req, res) => {
   const salesOrder = await SalesOrder.findById(req.body.salesOrder);
   if (!salesOrder) return res.status(400).send("Invalid Sales Order");
 
-  req.body.drItems.forEach(async drItem => {
+  req.body.drItems.forEach(async (drItem) => {
     const itemId = await Item.findById(drItem.item);
     if (!itemId) return res.status(400).send("Invalid Item");
   });
@@ -64,13 +70,13 @@ router.put("/:id", auth, async (req, res) => {
     {
       customer: {
         _id: customer._id,
-        name: customer.name
+        name: customer.name,
       },
       drItems: req.body.drItems,
       drRefNo: req.body.drRefNo,
       drDate: req.body.drDate,
       remarks: req.body.remarks,
-      salesOrder: salesOrder._id
+      salesOrder: salesOrder._id,
     },
     { new: true }
   );
