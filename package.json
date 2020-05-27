@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose --detectOpenHandles --runInBand --watchAll --config ./jest.config.json",
+    "test": "jest --verbose --detectOpenHandles --coverage --runInBand --watchAll --config ./jest.config.json",
     "start": "node index.js"
   },
   "keywords": [],

@@ -27,9 +27,9 @@ describe("/api/items", () => {
         .send();
 
       expect(res.status).toBe(200);
-      expect(res.body.some((i) => i.name === "Item1")).toBeTruthy();
-      expect(res.body.some((i) => i.name === "Item2")).toBeTruthy();
-      expect(res.body.some((i) => i.name === "Item3")).toBeTruthy();
+      expect(res.body.some(i => i.name === "Item1")).toBeTruthy();
+      expect(res.body.some(i => i.name === "Item2")).toBeTruthy();
+      expect(res.body.some(i => i.name === "Item3")).toBeTruthy();
     });
   });
 
@@ -149,6 +149,7 @@ describe("/api/items", () => {
       await item.save();
 
       id = item._id;
+      name = item.name;
     });
 
     const exec = () => {
@@ -181,6 +182,14 @@ describe("/api/items", () => {
 
       expect(res.status).toBe(200);
       expect(itemInDb).toBeNull();
+    });
+
+    it("should return the deleted item", async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty("_id", id.toString());
+      expect(res.body).toHaveProperty("name", name);
     });
   });
 

@@ -4,13 +4,13 @@ const mongoose = require("mongoose");
 const salesOrderItemsSchema = new mongoose.Schema({
   item: {
     type: new mongoose.Schema({
-      label: {
+      name: {
         type: String,
         required: true,
         maxLength: 255,
       },
-      value: {
-        type: String,
+      id: {
+        type: mongoose.Types.ObjectId,
         required: true,
       },
     }),
@@ -55,12 +55,12 @@ const SalesOrder = mongoose.model("SalesOrder", salesOrderSchema);
 
 function validateSalesOrder(salesOrder) {
   const schema = Joi.object({
-    customerId: Joi.objectId(),
+    customerId: Joi.objectId().required(),
     soItems: Joi.array().items(
       Joi.object({
         item: Joi.object({
-          label: Joi.string().max(255).required(),
-          value: Joi.string().max(255).required(),
+          name: Joi.string().max(255).required(),
+          id: Joi.objectId().max(255).required(),
         }),
         qty: Joi.number().min(0).required(),
         price: Joi.number().min(0).required(),
@@ -74,10 +74,5 @@ function validateSalesOrder(salesOrder) {
   return schema.validate(salesOrder, { allowUnknown: true });
 }
 
-function validateObjectId(id) {
-  return mongoose.Types.ObjectId.isValid(id);
-}
-
 exports.SalesOrder = SalesOrder;
-exports.validate = validateSalesOrder;
-exports.validateObjectId = validateObjectId;
+exports.validateSalesOrder = validateSalesOrder;

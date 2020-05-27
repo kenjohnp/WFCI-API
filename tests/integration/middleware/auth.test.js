@@ -1,5 +1,6 @@
 const { User } = require("../../../models/user");
 const request = require("supertest");
+const mongoose = require("mongoose");
 
 describe("Auth Middleware", () => {
   let token;
@@ -7,7 +8,7 @@ describe("Auth Middleware", () => {
   beforeEach(() => {
     server = require("../../../index");
     token = new User({
-      isAdmin: true,
+      isAdmin: true
     }).generateAuthToken();
   });
 
